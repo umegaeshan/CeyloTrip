@@ -143,6 +143,11 @@ public class ProfileActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_profile) {
                 return true;
             }
+            else if (itemId == R.id.nav_explore) {
+                startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
+                finish();
+                return true;
+            }
 
             return false;
         });

@@ -19,104 +19,69 @@ public class HomeActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     PackageAdapter adapter;
     List<PackageModel> packageList;
-
-    EditText etSearch; // Search Bar එක අඳුන්වලා දීම
     ImageView ivHeroBanner;
+    EditText etSearch; // එකතු කළා
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Search Bar එක සම්බන්ධ කිරීම
-        etSearch = findViewById(R.id.etSearch);
         ivHeroBanner = findViewById(R.id.ivHeroBanner);
+        recyclerView = findViewById(R.id.recyclerViewPackages);
+        etSearch = findViewById(R.id.etSearch); // ID සම්බන්ධ කළා
 
-        // Hero Banner එකට පින්තූරයක් දැමීම
         Glide.with(this)
-                .load("https://images.unsplash.com/photo-1546708973-c603a1523315?q=80&w=800")
+                .load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk-oaWYJWCqjr8D_BQ1p4eA13bIF4C2G74PwH2mLAfwA&s")
+                .centerCrop()
                 .into(ivHeroBanner);
 
-        // RecyclerView එක සම්බන්ධ කිරීම
-        recyclerView = findViewById(R.id.recyclerViewPackages);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // Packages දත්ත එකතු කිරීම
         packageList = new ArrayList<>();
-        packageList.add(new PackageModel(
-                "Galle Heritage & Sea",
-                "2 Days / 1 Night",
-                "18,000",
-                "https://images.unsplash.com/photo-1588258524337-017e8840243e?q=80&w=600"
-        ));
-        packageList.add(new PackageModel(
-                "Matara South Coast",
-                "2 Days / 1 Night",
-                "15,000",
-                "https://images.unsplash.com/photo-1550100411-93d3950ff456?q=80&w=600"
-        ));
-        packageList.add(new PackageModel(
-                "Nuwara Eliya Hill Escape",
-                "3 Days / 2 Nights",
-                "22,000",
-                "https://images.unsplash.com/photo-1620023608240-6213fc817293?q=80&w=600"
-        ));
+        packageList.add(new PackageModel("Galle Heritage & Sea", "2 Days / 1 Night", "18,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT63rYavV1gDd6ZrJDPKV2suFsCwiHAcL6IJRaMqDQLFw&s=10"));
+        packageList.add(new PackageModel("Matara South Coast", "2 Days / 1 Night", "15,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqLnjnI8YbRHmoBL7UfmIhXpYVlTOA9IQTXYU7RC-JHA&s=10"));
+        packageList.add(new PackageModel("Nuwara Eliya Hill", "3 Days / 2 Nights", "22,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbPiUhPavt2lc2cxyNWZ4vmc0xesrJtxTg7m-FP5sHKQ&s=10"));
 
-        // මුලින්ම ඔක්කොම Data ටික RecyclerView එකට දීම
         adapter = new PackageAdapter(this, packageList);
         recyclerView.setAdapter(adapter);
 
-        // ==========================================
-        // Search ක්‍රියාකාරීත්වය එකතු කිරීම
-        // ==========================================
         etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // අකුරු ටයිප් කරන ගමන් Filter Function එකට ඒ අකුරු යවනවා
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
                 filter(s.toString());
             }
         });
 
-        // ==========================================
-        // Bottom Navigation Bar එක
-        // ==========================================
         com.google.android.material.bottomnavigation.BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-
             if (itemId == R.id.nav_bookings) {
                 startActivity(new Intent(HomeActivity.this, MyBookingsActivity.class));
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
                 return true;
+            } else if (itemId == R.id.nav_explore) {
+                startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
+                finish();
+                return true;
             }
             return false;
         });
     }
 
-    // අකුරු වලට ගැළපෙන පැකේජ් හොයන Function එක
     private void filter(String text) {
         List<PackageModel> filteredList = new ArrayList<>();
-
         for (PackageModel item : packageList) {
-            // ටයිප් කරන අකුරු පැකේජ් එකේ නමේ තියෙනවද කියලා බලනවා (කැපිටල්/සිම්පල් ප්‍රශ්නයක් නැතිවෙන්න හදලා තියෙනවා)
             if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
             }
         }
-
         if (filteredList.isEmpty()) {
             Toast.makeText(this, "No packages found", Toast.LENGTH_SHORT).show();
         }
-
-        // අලුතින් හැදුණු (Filter වුණු) ලිස්ට් එක Adapter එකට දීලා තිරයේ පෙන්වනවා
         adapter = new PackageAdapter(this, filteredList);
         recyclerView.setAdapter(adapter);
     }

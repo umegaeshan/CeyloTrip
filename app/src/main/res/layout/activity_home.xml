@@ -166,12 +166,13 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginLeft="20dp"/>
 
+            <!-- activity_home.xml හි RecyclerView කොටස -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewPackages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:paddingHorizontal="10dp"
+                android:paddingBottom="100dp"
                 android:clipToPadding="false" />
 
         </LinearLayout>

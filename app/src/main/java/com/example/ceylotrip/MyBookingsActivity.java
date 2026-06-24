@@ -93,6 +93,11 @@ public class MyBookingsActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
+            else if (itemId == R.id.nav_explore) {
+                startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
+                finish();
+                return true;
+            }
             return false;
         });
     }
