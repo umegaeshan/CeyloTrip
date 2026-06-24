@@ -3,10 +3,12 @@ package com.example.ceylotrip;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -29,54 +31,73 @@ public class MyBookingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_bookings);
 
-        // 1. XML එකේ තියෙන RecyclerView එක සම්බන්ධ කිරීම
         rvMyBookings = findViewById(R.id.rvMyBookings);
         rvMyBookings.setLayoutManager(new LinearLayoutManager(this));
 
-        // ලිස්ට් එක සහ Adapter එක හැදීම
         bookingList = new ArrayList<>();
-        adapter = new BookingAdapter(this, bookingList);
+
+        // 1. Adapter එක හදනකොට අලුතින් Click Listener එකත් පාස් කරනවා
+        adapter = new BookingAdapter(this, bookingList, new BookingAdapter.OnBookingClickListener() {
+            @Override
+            public void onEditClick(BookingModel booking) {
+                // Edit බොත්තම එබුවම BookingActivity එකට යනවා (Edit Mode එකෙන්)
+                Intent intent = new Intent(MyBookingsActivity.this, BookingActivity.class);
+                intent.putExtra("isEditMode", true); // මේක අලුතින් edit කරන්න යන බව කියන්න
+                intent.putExtra("documentId", booking.getDocumentId()); // අදාළ බුකිං එකේ ID එක
+                intent.putExtra("packageName", booking.getPackageName());
+                // මිල වෙනස් කරලා තියෙන නිසා පරණ BasePrice එක ගන්න විදිහක් අපි ඊළඟට BookingActivity එකේදී හදමු
+                startActivity(intent);
+            }
+
+            @Override
+            public void onDeleteClick(BookingModel booking, int position) {
+                // මකන්න කලින් ඇත්තටම මකන්නද කියලා අහනවා (Confirmation Dialog)
+                new AlertDialog.Builder(MyBookingsActivity.this)
+                        .setTitle("Cancel Booking")
+                        .setMessage("Are you sure you want to cancel this booking?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Yes දුන්නොත් Database එකෙන් මකන Function එකට යනවා
+                            deleteBooking(booking.getDocumentId(), position);
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+        });
+
         rvMyBookings.setAdapter(adapter);
 
-        // 2. Firebase Initialize කිරීම
+        // Firebase Initialize කිරීම
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
 
-        // 3. Database එකෙන් දත්ත ගැනීම අරඹනවා
+        // Database එකෙන් දත්ත ගැනීම අරඹනවා
         fetchMyBookings();
 
         // ==========================================
         // Bottom Navigation Bar එක සම්බන්ධ කිරීම
         // ==========================================
-        com.google.android.material.bottomnavigation.BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigationBookings);
-
-        // මේ පිටුවට ආවම "Bookings" අයිකන් එක Select වෙලා තියෙන්න ඕනේ
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigationBookings);
         bottomNavigation.setSelectedItemId(R.id.nav_bookings);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home) {
-                // Home අයිකන් එක එබුවම ආපහු HomeActivity එකට යනවා
                 startActivity(new Intent(MyBookingsActivity.this, HomeActivity.class));
-                finish(); // මේ පිටුව වහනවා ආපහු Back කරන්න බැරි වෙන්න
+                finish();
                 return true;
             } else if (itemId == R.id.nav_bookings) {
-                // දැනටමත් ඉන්නේ Bookings පිටුවේ නිසා මුකුත් කරන්නේ නෑ
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                // Profile පිටුවට යනවා සහ මේ පිටුව වහනවා
                 startActivity(new Intent(MyBookingsActivity.this, ProfileActivity.class));
                 finish();
                 return true;
             }
-
             return false;
         });
     }
 
     private void fetchMyBookings() {
-        // දැනට ලොග් වෙලා ඉන්න කෙනාගේ User ID එක ගන්නවා
         if (fAuth.getCurrentUser() == null) {
             Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show();
             return;
@@ -84,32 +105,46 @@ public class MyBookingsActivity extends AppCompatActivity {
 
         String userID = fAuth.getCurrentUser().getUid();
 
-        // "Bookings" Collection එකෙන් මේ User ID එකට අදාළ දත්ත විතරක් හොයනවා
         fStore.collection("Bookings")
                 .whereEqualTo("userId", userID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        bookingList.clear(); // පරණ දත්ත තියෙනවා නම් මකනවා
+                        bookingList.clear();
 
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Database එකේ තියෙන දත්ත BookingModel එකට දාගන්නවා
                             BookingModel booking = document.toObject(BookingModel.class);
+                            // අලුත් කොටස: Database එකේ Document ID එක අරගෙන Model එකට දානවා (මකන්න සහ edit කරන්න මේක අත්‍යවශ්‍යයි)
+                            booking.setDocumentId(document.getId());
                             bookingList.add(booking);
                         }
 
-                        // අලුත් දත්ත ආවා කියලා Adapter එකට කියනවා (එතකොට තිරයේ පෙනෙනවා)
                         adapter.notifyDataSetChanged();
 
-                        // බුකිං මුකුත් නැත්නම් පොඩි මැසේජ් එකක් දෙනවා
                         if (bookingList.isEmpty()) {
                             Toast.makeText(MyBookingsActivity.this, "No bookings found.", Toast.LENGTH_SHORT).show();
                         }
-
                     } else {
-                        // Error එකක් ආවොත් පෙන්වනවා
                         Toast.makeText(MyBookingsActivity.this, "Error getting data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    // 2. අලුත් කොටස: Database එකෙන් බුකිං එක මකා දැමීම
+    private void deleteBooking(String documentId, int position) {
+        if (documentId == null) return;
+
+        fStore.collection("Bookings").document(documentId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(MyBookingsActivity.this, "Booking Cancelled Successfully", Toast.LENGTH_SHORT).show();
+
+                    // Database එකෙන් මැකුවට පස්සේ අපේ ලැයිස්තුවෙනුත් අයින් කරලා තිරයෙන් මකනවා
+                    bookingList.remove(position);
+                    adapter.notifyItemRemoved(position);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MyBookingsActivity.this, "Failed to cancel booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

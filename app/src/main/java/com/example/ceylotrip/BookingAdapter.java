@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,57 +15,68 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
 
     Context context;
     List<BookingModel> bookingList;
+    OnBookingClickListener listener;
 
-    public BookingAdapter(Context context, List<BookingModel> bookingList) {
+    // බොත්තම් එබුවම වැඩ කරන්න Interface එකක් හැදීම
+    public interface OnBookingClickListener {
+        void onEditClick(BookingModel booking);
+        void onDeleteClick(BookingModel booking, int position);
+    }
+
+    public BookingAdapter(Context context, List<BookingModel> bookingList, OnBookingClickListener listener) {
         this.context = context;
         this.bookingList = bookingList;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // අර අපි හදපු item_booking.xml කාඩ් ඩිසයින් එක මෙතනින් ගන්නවා
         View view = LayoutInflater.from(context).inflate(R.layout.item_booking, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // ලිස්ට් එකෙන් අදාළ බුකිං එක ගන්නවා
         BookingModel currentBooking = bookingList.get(position);
 
-        // අකුරු ටික සෙට් කරනවා
         holder.tvPackageName.setText(currentBooking.getPackageName());
         holder.tvDate.setText("Date: " + currentBooking.getTravelDate());
         holder.tvPrice.setText("Total: Rs. " + currentBooking.getTotalPrice());
 
-        // Status එක පෙන්වීම සහ ලස්සනට පාට වෙනස් කිරීම
         String status = currentBooking.getStatus();
         holder.tvStatus.setText("Status: " + status);
 
         if ("Pending".equals(status)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#FFA000")); // Pending නම් තැඹිලි පාටයි
+            holder.tvStatus.setTextColor(Color.parseColor("#FFA000"));
         } else if ("Confirmed".equals(status)) {
-            holder.tvStatus.setTextColor(Color.parseColor("#009772")); // Confirmed නම් කොළ පාටයි
+            holder.tvStatus.setTextColor(Color.parseColor("#009772"));
         }
+
+        // බොත්තම් Click කිරීම්
+        holder.btnEdit.setOnClickListener(v -> listener.onEditClick(currentBooking));
+        holder.btnDelete.setOnClickListener(v -> listener.onDeleteClick(currentBooking, position));
     }
 
     @Override
     public int getItemCount() {
-        return bookingList.size(); // බුකිං කීයක් තියෙනවද කියලා ගණන් කරනවා
+        return bookingList.size();
     }
 
-    // කාඩ් එකේ තියෙන UI අංග ටික අඳුන්වලා දෙන Class එක
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvPackageName, tvDate, tvStatus, tvPrice;
+        Button btnEdit, btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // item_booking.xml එකේ ID ටික සම්බන්ධ කිරීම
             tvPackageName = itemView.findViewById(R.id.tvBookedPackageName);
             tvDate = itemView.findViewById(R.id.tvBookedDate);
             tvStatus = itemView.findViewById(R.id.tvBookedStatus);
             tvPrice = itemView.findViewById(R.id.tvBookedPrice);
+
+            // අලුත් බොත්තම් දෙක සම්බන්ධ කිරීම
+            btnEdit = itemView.findViewById(R.id.btnEditBooking);
+            btnDelete = itemView.findViewById(R.id.btnCancelBooking);
         }
     }
 }

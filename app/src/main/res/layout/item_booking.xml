@@ -18,7 +18,6 @@
             android:id="@+id/tvBookedPackageName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Package Name"
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -28,7 +27,6 @@
             android:id="@+id/tvBookedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date: 12/12/2026"
             android:textColor="#757575"
             android:textSize="14sp"
             android:layout_marginBottom="4dp"/>
@@ -37,8 +35,6 @@
             android:id="@+id/tvBookedStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status: Pending"
-            android:textColor="#FFA000"
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginBottom="10dp"/>
@@ -47,10 +43,38 @@
             android:id="@+id/tvBookedPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total: Rs. 0"
             android:textColor="#009772"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:layout_marginBottom="15dp"/>
+
+        <!-- අලුතින් එකතු කළ බොත්තම් දෙක -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnEditBooking"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:text="Edit"
+                android:backgroundTint="#2196F3"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="5dp"/>
+
+            <Button
+                android:id="@+id/btnCancelBooking"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:backgroundTint="#E53935"
+                android:textColor="#FFFFFF"
+                android:layout_marginLeft="5dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
