@@ -1,6 +1,6 @@
 package com.example.ceylotrip;
 
-import android.content.Intent; // Intent සඳහා අලුතින් එකතු කළ Import එක
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +63,11 @@ public class MyBookingsActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_bookings) {
                 // දැනටමත් ඉන්නේ Bookings පිටුවේ නිසා මුකුත් කරන්නේ නෑ
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                // Profile පිටුවට යනවා සහ මේ පිටුව වහනවා
+                startActivity(new Intent(MyBookingsActivity.this, ProfileActivity.class));
+                finish();
                 return true;
             }
 

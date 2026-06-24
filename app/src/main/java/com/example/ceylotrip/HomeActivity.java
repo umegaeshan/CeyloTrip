@@ -76,8 +76,10 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, MyBookingsActivity.class));
                 return true;
             }
-            // අනාගතයේදී Search, Profile වලටත් මේ විදිහටම ලියන්න පුළුවන්
-
+            else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+            return true;
+        }
             return false;
         });
     }
