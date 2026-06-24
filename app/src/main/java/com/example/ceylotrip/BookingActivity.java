@@ -1,32 +1,47 @@
 package com.example.ceylotrip;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+// අලුතින් එකතු කරපු Firebase Imports
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BookingActivity extends AppCompatActivity {
 
-    // UI අංග ටික අඳුන්වලා දීම
     TextView tvBookingPackageName, tvTravelDate, tvAdultCount, tvChildCount, tvTotalPrice;
     Button btnAdultPlus, btnAdultMinus, btnChildPlus, btnChildMinus, btnConfirmBooking;
     CheckBox cbLocalGuide, cbTransport;
 
-    // ගණනය කිරීම් සඳහා අවශ්‍ය Variables
-    int basePrice = 0; // එක්කෙනෙක්ගේ මිල
-    int adultCount = 1; // මුලින්ම වැඩිහිටියන් 1යි
-    int childCount = 0; // මුලින්ම ළමයි 0යි
+    int basePrice = 0;
+    int adultCount = 1;
+    int childCount = 0;
+    int finalTotal = 0; // Database එකට යවන්න ලේසි වෙන්න මේක එළියට ගත්තා
+
+    // Firebase Variables
+    FirebaseAuth fAuth;
+    FirebaseFirestore fStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        // 1. XML එකේ තියෙන Views Java වලට සම්බන්ධ කිරීම
+        // Firebase Initialize කිරීම
+        fAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
+
+        // XML එකේ Views සම්බන්ධ කිරීම
         tvBookingPackageName = findViewById(R.id.tvBookingPackageName);
         tvTravelDate = findViewById(R.id.tvTravelDate);
         tvAdultCount = findViewById(R.id.tvAdultCount);
@@ -42,61 +57,52 @@ public class BookingActivity extends AppCompatActivity {
         cbLocalGuide = findViewById(R.id.cbLocalGuide);
         cbTransport = findViewById(R.id.cbTransport);
 
-        // 2. DetailsActivity එකෙන් එවපු දත්ත ලබා ගැනීම
+        // DetailsActivity එකෙන් එවපු දත්ත ලබා ගැනීම
         String packageName = getIntent().getStringExtra("packageName");
-        String priceString = getIntent().getStringExtra("packagePrice"); // උදා: "18,000"
+        String priceString = getIntent().getStringExtra("packagePrice");
 
         if (packageName != null) {
             tvBookingPackageName.setText(packageName);
         }
 
-        // මිල ගණනය කරන්න පුළුවන් ඉලක්කමක් (Integer) බවට පත් කිරීම (කොමා අයින් කිරීම)
         if (priceString != null) {
             try {
-                // "18,000" -> "18000" බවට පත් කරලා int එකක් කරනවා
                 basePrice = Integer.parseInt(priceString.replace(",", ""));
             } catch (NumberFormatException e) {
                 basePrice = 0;
             }
         }
 
-        // මුල්ම මිල පෙන්වීම
         calculateTotal();
 
-        // 3. Date Picker (දිනය තෝරන්න Calendar එකක් දීම)
+        // Date Picker
         tvTravelDate.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     BookingActivity.this,
                     (view, selectedYear, selectedMonth, selectedDay) -> {
-                        // තේරුවට පස්සේ දිනය පෙන්වනවා
                         String date = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
                         tvTravelDate.setText(date);
                     },
-                    year, month, day);
+                    calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             datePickerDialog.show();
         });
 
-        // 4. Adults (වැඩිහිටියන්) ගණන වෙනස් කිරීම
+        // Counters
         btnAdultPlus.setOnClickListener(v -> {
             adultCount++;
             tvAdultCount.setText(String.valueOf(adultCount));
-            calculateTotal(); // ගණන වෙනස් වුණාම මුළු මුදලත් හදනවා
+            calculateTotal();
         });
 
         btnAdultMinus.setOnClickListener(v -> {
-            if (adultCount > 1) { // 1ට වඩා අඩුවෙන්න දෙන්නේ නෑ
+            if (adultCount > 1) {
                 adultCount--;
                 tvAdultCount.setText(String.valueOf(adultCount));
                 calculateTotal();
             }
         });
 
-        // 5. Children (ළමයින්) ගණන වෙනස් කිරීම
         btnChildPlus.setOnClickListener(v -> {
             childCount++;
             tvChildCount.setText(String.valueOf(childCount));
@@ -104,45 +110,71 @@ public class BookingActivity extends AppCompatActivity {
         });
 
         btnChildMinus.setOnClickListener(v -> {
-            if (childCount > 0) { // 0ට වඩා අඩුවෙන්න දෙන්නේ නෑ
+            if (childCount > 0) {
                 childCount--;
                 tvChildCount.setText(String.valueOf(childCount));
                 calculateTotal();
             }
         });
 
-        // 6. Add-ons (අමතර දේවල්) Check කරද්දී මිල වෙනස් කිරීම
+        // Checkboxes
         cbLocalGuide.setOnCheckedChangeListener((buttonView, isChecked) -> calculateTotal());
         cbTransport.setOnCheckedChangeListener((buttonView, isChecked) -> calculateTotal());
 
-        // 7. Confirm බොත්තම එබුවම
+        // ==========================================
+        // 7. අලුත් කොටස: Database එකට සේව් කිරීම
+        // ==========================================
         btnConfirmBooking.setOnClickListener(v -> {
-            if (tvTravelDate.getText().toString().equals("Select Date")) {
+            String selectedDate = tvTravelDate.getText().toString();
+
+            if (selectedDate.equals("Select Date")) {
                 Toast.makeText(BookingActivity.this, "Please select a travel date!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(BookingActivity.this, "Booking Confirmed Successfully!", Toast.LENGTH_LONG).show();
-                // මීළඟ පියවරේදී අපි මේ දත්ත Firebase Database එකට සේව් කරමු
+                return; // දිනයක් දීලා නැත්නම් මෙතනින් නවතිනවා
             }
+
+            // ලොග් වෙලා ඉන්න කෙනාගේ User ID එක ගන්නවා
+            String userID = fAuth.getCurrentUser().getUid();
+
+            // සේව් කරන්න ඕන දත්ත ටික Map එකකට (පැකට් එකකට) දානවා
+            Map<String, Object> bookingData = new HashMap<>();
+            bookingData.put("userId", userID);
+            bookingData.put("packageName", packageName);
+            bookingData.put("travelDate", selectedDate);
+            bookingData.put("adults", adultCount);
+            bookingData.put("children", childCount);
+            bookingData.put("hasLocalGuide", cbLocalGuide.isChecked());
+            bookingData.put("hasTransport", cbTransport.isChecked());
+            bookingData.put("totalPrice", finalTotal);
+            bookingData.put("status", "Pending"); // මුලින්ම Pending විදිහට සේව් කරමු
+
+            // "Bookings" කියන අලුත් Collection එකට මේක සේව් කරනවා
+            fStore.collection("Bookings").add(bookingData).addOnSuccessListener(documentReference -> {
+                // සේව් වුණාම පෙන්වන මැසේජ් එක
+                Toast.makeText(BookingActivity.this, "Booking Successful!", Toast.LENGTH_LONG).show();
+
+                // සේව් වුණාට පස්සේ ආපහු Home Screen එකට යවනවා
+                Intent intent = new Intent(BookingActivity.this, HomeActivity.class);
+                // අලුත් Activity එකක් අරින්නේ නැතුව, පරණ Home එකටම යන්න මේ Flags දානවා
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+
+            }).addOnFailureListener(e -> {
+                Toast.makeText(BookingActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+
         });
     }
 
-    // මුළු මුදල සජීවීව ගණනය කරන Function එක
     private void calculateTotal() {
-        // වැඩිහිටියන්ට සම්පූර්ණ ගාණ
         int adultTotal = adultCount * basePrice;
-
-        // ළමයින්ට ගාණෙන් භාගයයි (Half Price)
         int childTotal = childCount * (basePrice / 2);
 
-        // Add-ons වල මිල (Check කරලා නම් විතරක් එකතු කරනවා)
         int addonsTotal = 0;
         if (cbLocalGuide.isChecked()) addonsTotal += 5000;
         if (cbTransport.isChecked()) addonsTotal += 10000;
 
-        // සම්පූර්ණ එකතුව
-        int finalTotal = adultTotal + childTotal + addonsTotal;
-
-        // එකතුව පෙන්වීම
+        finalTotal = adultTotal + childTotal + addonsTotal; // අලුතින් හදපු variable එකට දානවා
         tvTotalPrice.setText("Rs. " + finalTotal);
     }
 }
