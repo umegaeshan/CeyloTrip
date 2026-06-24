@@ -17,8 +17,15 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="20dp"/>
 
-    <!-- මෙතන තමයි අපි ඊළඟට Packages (CardViews) ටික පෙන්වන RecyclerView එක දාන්නේ -->
-    <!-- දැනට ඒ කොටස හිස්ව තියමු -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPackages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvWelcomeMessage"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:clipToPadding="false" />
 
 
     <!-- පහළින්ම තියෙන Bottom Navigation Bar එක -->
