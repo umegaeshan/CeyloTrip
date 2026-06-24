@@ -1,5 +1,6 @@
 package com.example.ceylotrip;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -46,8 +47,11 @@ public class DetailsActivity extends AppCompatActivity {
 
         // Book Now බොත්තම එබුවම වෙන දේ (දැනට පොඩි මැසේජ් එකක් විතරක් පෙන්වමු)
         btnBookNow.setOnClickListener(v -> {
-            Toast.makeText(DetailsActivity.this, "Booking form loading...", Toast.LENGTH_SHORT).show();
-            // ඊළඟ පියවරේදී අපි මෙතනින් අපේ අලුත් Dynamic Booking Form එකට යන්න හදමු!
+            Intent intent = new Intent(DetailsActivity.this, BookingActivity.class);
+            // පැකේජ් එකේ නම සහ මිල ඊළඟ පිටුවට යවනවා
+            intent.putExtra("packageName", title);
+            intent.putExtra("packagePrice", price);
+            startActivity(intent);
         });
     }
 }
