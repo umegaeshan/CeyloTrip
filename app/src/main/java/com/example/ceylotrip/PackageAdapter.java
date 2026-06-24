@@ -1,6 +1,7 @@
 package com.example.ceylotrip;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,24 @@ public class PackageAdapter extends RecyclerView.Adapter<PackageAdapter.ViewHold
         Glide.with(context)
                 .load(currentPackage.getImageUrl())
                 .into(holder.ivImage);
+
+        // කාඩ් එක Click කළාම වෙන දේ
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // DetailsActivity එකට යන්න Intent එකක් හදනවා
+                Intent intent = new Intent(context, DetailsActivity.class);
+
+                // අදාළ පැකේජ් එකේ විස්තර ටික Intent එක ඇතුළට දානවා (ඊළඟ පිටුවට අරන් යන්න)
+                intent.putExtra("title", currentPackage.getTitle());
+                intent.putExtra("duration", currentPackage.getDuration());
+                intent.putExtra("price", currentPackage.getPrice());
+                intent.putExtra("imageUrl", currentPackage.getImageUrl());
+
+                // ඊළඟ පිටුවට යනවා
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
