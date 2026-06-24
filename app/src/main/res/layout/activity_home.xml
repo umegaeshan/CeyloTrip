@@ -3,32 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8ED"> <!-- අපේ ළා පසුබිම් වර්ණය -->
+    android:background="#FFF8ED">
 
-    <!-- උඩින්ම තියෙන පිළිගැනීමේ පණිවිඩය -->
-    <TextView
-        android:id="@+id/tvWelcomeMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello, Eshan!\nWhere to next?"
-        android:textColor="#009772"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewPackages"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvWelcomeMessage"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:clipToPadding="false" />
-
-
-    <!-- පහළින්ම තියෙන Bottom Navigation Bar එක -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -39,5 +15,165 @@
         app:itemTextColor="#009772"
         app:menu="@menu/bottom_nav_menu"
         android:elevation="8dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigation"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/tvWelcomeMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, Eshan!\nWhere to next?"
+                android:textColor="#009772"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="Search destinations..."
+                    android:drawableLeft="@drawable/ic_search"
+                    android:drawablePadding="10dp"
+                    android:paddingHorizontal="15dp"
+                    android:maxLines="1"
+                    android:inputType="text"/>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/ivHeroBanner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:background="#D4F1E0"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Discover\nSri Lanka"
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentBottom="true"
+                        android:layout_margin="15dp"
+                        android:shadowColor="#000000"
+                        android:shadowDx="2"
+                        android:shadowDy="2"
+                        android:shadowRadius="4"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Categories"
+                android:textColor="#212121"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="25dp"
+                android:layout_marginLeft="20dp"/>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:scrollbars="none"
+                android:paddingHorizontal="15dp"
+                android:clipToPadding="false">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⛱️ Beaches"
+                        android:backgroundTint="#FFFFFF"
+                        android:textColor="#009772"
+                        android:layout_marginHorizontal="5dp"
+                        app:cornerRadius="20dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🐘 Wildlife"
+                        android:backgroundTint="#FFFFFF"
+                        android:textColor="#009772"
+                        android:layout_marginHorizontal="5dp"
+                        app:cornerRadius="20dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🏛️ Heritage"
+                        android:backgroundTint="#FFFFFF"
+                        android:textColor="#009772"
+                        android:layout_marginHorizontal="5dp"
+                        app:cornerRadius="20dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⛰️ Hiking"
+                        android:backgroundTint="#FFFFFF"
+                        android:textColor="#009772"
+                        android:layout_marginHorizontal="5dp"
+                        app:cornerRadius="20dp"/>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Popular Packages"
+                android:textColor="#212121"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="25dp"
+                android:layout_marginLeft="20dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewPackages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingHorizontal="10dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

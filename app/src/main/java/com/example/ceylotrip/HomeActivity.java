@@ -1,9 +1,11 @@
 package com.example.ceylotrip;
 
 import android.os.Bundle;
+import android.widget.ImageView; // ImageView සඳහා Import එක
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide; // Glide සඳහා Import එක
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +15,23 @@ public class HomeActivity extends AppCompatActivity {
     PackageAdapter adapter;
     List<PackageModel> packageList;
 
+    // Hero Banner එක අඳුන්වලා දීම
+    ImageView ivHeroBanner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Hero Banner එක ID එකෙන් හොයාගෙන සම්බන්ධ කිරීම
+        ivHeroBanner = findViewById(R.id.ivHeroBanner);
+
+        // Glide පාවිච්චි කරලා ලස්සන ශ්‍රී ලංකාවේ පින්තූරයක් Banner එකට Load කරනවා
+        Glide.with(this)
+                .load("https://images.unsplash.com/photo-1546708973-c603a1523315?q=80&w=800") // සීගිරිය වගේ ලස්සන පින්තූරයක්
+                .into(ivHeroBanner);
+
+        // RecyclerView එක සම්බන්ධ කිරීම
         recyclerView = findViewById(R.id.recyclerViewPackages);
 
         // ලිස්ට් එක වමේ ඉඳන් දකුණට (Horizontal) යන්න සෙට් කිරීම
