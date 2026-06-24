@@ -1,11 +1,12 @@
 package com.example.ceylotrip;
 
+import android.content.Intent; // Intent සඳහා අලුතින් එකතු කළ Import එක
 import android.os.Bundle;
-import android.widget.ImageView; // ImageView සඳහා Import එක
+import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide; // Glide සඳහා Import එක
+import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,5 +62,23 @@ public class HomeActivity extends AppCompatActivity {
         // Adapter එක හරහා Data ටික RecyclerView එකට දීම
         adapter = new PackageAdapter(this, packageList);
         recyclerView.setAdapter(adapter);
+
+        // ==========================================
+        // අලුතින් එකතු කළ Bottom Navigation කොටස
+        // ==========================================
+        com.google.android.material.bottomnavigation.BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_bookings) {
+                // Bookings අයිකන් එක එබුවම MyBookingsActivity එකට යනවා
+                startActivity(new Intent(HomeActivity.this, MyBookingsActivity.class));
+                return true;
+            }
+            // අනාගතයේදී Search, Profile වලටත් මේ විදිහටම ලියන්න පුළුවන්
+
+            return false;
+        });
     }
 }
