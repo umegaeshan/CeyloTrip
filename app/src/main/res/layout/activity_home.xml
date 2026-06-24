@@ -1,10 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    android:background="#FFF8ED"> <!-- අපේ ළා පසුබිම් වර්ණය -->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- උඩින්ම තියෙන පිළිගැනීමේ පණිවිඩය -->
+    <TextView
+        android:id="@+id/tvWelcomeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello, Eshan!\nWhere to next?"
+        android:textColor="#009772"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"/>
+
+    <!-- මෙතන තමයි අපි ඊළඟට Packages (CardViews) ටික පෙන්වන RecyclerView එක දාන්නේ -->
+    <!-- දැනට ඒ කොටස හිස්ව තියමු -->
+
+
+    <!-- පහළින්ම තියෙන Bottom Navigation Bar එක -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        app:itemIconTint="#009772"
+        app:itemTextColor="#009772"
+        app:menu="@menu/bottom_nav_menu"
+        android:elevation="8dp"/>
+
+</RelativeLayout>
