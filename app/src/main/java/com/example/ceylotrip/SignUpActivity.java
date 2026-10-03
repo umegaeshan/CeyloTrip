@@ -75,10 +75,13 @@ public class SignUpActivity extends AppCompatActivity {
 
                     // Firestore එකේ "Users" කියන Collection එකට Data ටික සේව් කරනවා
                     fStore.collection("Users").document(userID).set(user).addOnSuccessListener(aVoid -> {
-                        Toast.makeText(SignUpActivity.this, "Account Created Successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, "Account Created Successfully! Please Login.", Toast.LENGTH_SHORT).show();
 
-                        // සේව් වුණාට පස්සේ HomeActivity එකට යවනවා
-                        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                        // අලුතින් හැදුණු ගිණුමෙන් Sign Out කරනවා (එවිට අනිවාර්යයෙන්ම Login විය යුතුයි)
+                        fAuth.signOut();
+
+                        // සේව් වුණාට පස්සේ HomeActivity වෙනුවට LoginActivity එකට යවනවා
+                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish(); // ආයේ Sign Up එකට Back වෙන්න බැරි වෙන්න
                     });

@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-// අලුතින් එකතු කරපු Firebase Imports
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 
 public class BookingActivity extends AppCompatActivity {
 
+    ImageView ivBookingImage;
     TextView tvBookingPackageName, tvTravelDate, tvAdultCount, tvChildCount, tvTotalPrice;
     Button btnAdultPlus, btnAdultMinus, btnChildPlus, btnChildMinus, btnConfirmBooking;
     CheckBox cbLocalGuide, cbTransport;
@@ -26,9 +28,8 @@ public class BookingActivity extends AppCompatActivity {
     int basePrice = 0;
     int adultCount = 1;
     int childCount = 0;
-    int finalTotal = 0; // Database එකට යවන්න ලේසි වෙන්න මේක එළියට ගත්තා
+    int finalTotal = 0;
 
-    // Firebase Variables
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
 
@@ -37,11 +38,10 @@ public class BookingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        // Firebase Initialize කිරීම
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
 
-        // XML එකේ Views සම්බන්ධ කිරීම
+        ivBookingImage = findViewById(R.id.ivBookingImage);
         tvBookingPackageName = findViewById(R.id.tvBookingPackageName);
         tvTravelDate = findViewById(R.id.tvTravelDate);
         tvAdultCount = findViewById(R.id.tvAdultCount);
@@ -57,9 +57,10 @@ public class BookingActivity extends AppCompatActivity {
         cbLocalGuide = findViewById(R.id.cbLocalGuide);
         cbTransport = findViewById(R.id.cbTransport);
 
-        // DetailsActivity එකෙන් එවපු දත්ත ලබා ගැනීම
+        // පෙර පිටුවෙන් දත්ත ලබා ගැනීම
         String packageName = getIntent().getStringExtra("packageName");
         String priceString = getIntent().getStringExtra("packagePrice");
+        String imageUrl = getIntent().getStringExtra("imageUrl");
 
         if (packageName != null) {
             tvBookingPackageName.setText(packageName);
@@ -67,15 +68,22 @@ public class BookingActivity extends AppCompatActivity {
 
         if (priceString != null) {
             try {
-                basePrice = Integer.parseInt(priceString.replace(",", ""));
+                basePrice = Integer.parseInt(priceString.replace(",", "").replace("Rs. ", "").trim());
             } catch (NumberFormatException e) {
                 basePrice = 0;
             }
         }
 
+        // පින්තූරය Load කිරීම
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(imageUrl)
+                    .centerCrop()
+                    .into(ivBookingImage);
+        }
+
         calculateTotal();
 
-        // Date Picker
         tvTravelDate.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -88,7 +96,6 @@ public class BookingActivity extends AppCompatActivity {
             datePickerDialog.show();
         });
 
-        // Counters
         btnAdultPlus.setOnClickListener(v -> {
             adultCount++;
             tvAdultCount.setText(String.valueOf(adultCount));
@@ -117,25 +124,19 @@ public class BookingActivity extends AppCompatActivity {
             }
         });
 
-        // Checkboxes
         cbLocalGuide.setOnCheckedChangeListener((buttonView, isChecked) -> calculateTotal());
         cbTransport.setOnCheckedChangeListener((buttonView, isChecked) -> calculateTotal());
 
-        // ==========================================
-        // 7. අලුත් කොටස: Database එකට සේව් කිරීම
-        // ==========================================
         btnConfirmBooking.setOnClickListener(v -> {
             String selectedDate = tvTravelDate.getText().toString();
 
             if (selectedDate.equals("Select Date")) {
                 Toast.makeText(BookingActivity.this, "Please select a travel date!", Toast.LENGTH_SHORT).show();
-                return; // දිනයක් දීලා නැත්නම් මෙතනින් නවතිනවා
+                return;
             }
 
-            // ලොග් වෙලා ඉන්න කෙනාගේ User ID එක ගන්නවා
             String userID = fAuth.getCurrentUser().getUid();
 
-            // සේව් කරන්න ඕන දත්ත ටික Map එකකට (පැකට් එකකට) දානවා
             Map<String, Object> bookingData = new HashMap<>();
             bookingData.put("userId", userID);
             bookingData.put("packageName", packageName);
@@ -145,16 +146,12 @@ public class BookingActivity extends AppCompatActivity {
             bookingData.put("hasLocalGuide", cbLocalGuide.isChecked());
             bookingData.put("hasTransport", cbTransport.isChecked());
             bookingData.put("totalPrice", finalTotal);
-            bookingData.put("status", "Pending"); // මුලින්ම Pending විදිහට සේව් කරමු
+            bookingData.put("status", "Pending");
 
-            // "Bookings" කියන අලුත් Collection එකට මේක සේව් කරනවා
             fStore.collection("Bookings").add(bookingData).addOnSuccessListener(documentReference -> {
-                // සේව් වුණාම පෙන්වන මැසේජ් එක
                 Toast.makeText(BookingActivity.this, "Booking Successful!", Toast.LENGTH_LONG).show();
 
-                // සේව් වුණාට පස්සේ ආපහු Home Screen එකට යවනවා
                 Intent intent = new Intent(BookingActivity.this, HomeActivity.class);
-                // අලුත් Activity එකක් අරින්නේ නැතුව, පරණ Home එකටම යන්න මේ Flags දානවා
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
@@ -162,7 +159,6 @@ public class BookingActivity extends AppCompatActivity {
             }).addOnFailureListener(e -> {
                 Toast.makeText(BookingActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
-
         });
     }
 
@@ -174,7 +170,7 @@ public class BookingActivity extends AppCompatActivity {
         if (cbLocalGuide.isChecked()) addonsTotal += 5000;
         if (cbTransport.isChecked()) addonsTotal += 10000;
 
-        finalTotal = adultTotal + childTotal + addonsTotal; // අලුතින් හදපු variable එකට දානවා
+        finalTotal = adultTotal + childTotal + addonsTotal;
         tvTotalPrice.setText("Rs. " + finalTotal);
     }
 }

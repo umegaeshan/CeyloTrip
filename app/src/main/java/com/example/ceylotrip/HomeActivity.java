@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,8 @@ public class HomeActivity extends AppCompatActivity {
     PackageAdapter adapter;
     List<PackageModel> packageList;
     ImageView ivHeroBanner;
-    EditText etSearch; // එකතු කළා
+    EditText etSearch;
+    FirebaseFirestore fStore; // Firebase එකතු කළා
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +33,8 @@ public class HomeActivity extends AppCompatActivity {
 
         ivHeroBanner = findViewById(R.id.ivHeroBanner);
         recyclerView = findViewById(R.id.recyclerViewPackages);
-        etSearch = findViewById(R.id.etSearch); // ID සම්බන්ධ කළා
+        etSearch = findViewById(R.id.etSearch);
+        fStore = FirebaseFirestore.getInstance(); // Firebase Initialize කිරීම
 
         Glide.with(this)
                 .load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk-oaWYJWCqjr8D_BQ1p4eA13bIF4C2G74PwH2mLAfwA&s")
@@ -37,15 +42,14 @@ public class HomeActivity extends AppCompatActivity {
                 .into(ivHeroBanner);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
         packageList = new ArrayList<>();
-        packageList.add(new PackageModel("Galle Heritage & Sea", "2 Days / 1 Night", "18,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT63rYavV1gDd6ZrJDPKV2suFsCwiHAcL6IJRaMqDQLFw&s=10"));
-        packageList.add(new PackageModel("Matara South Coast", "2 Days / 1 Night", "15,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqLnjnI8YbRHmoBL7UfmIhXpYVlTOA9IQTXYU7RC-JHA&s=10"));
-        packageList.add(new PackageModel("Nuwara Eliya Hill", "3 Days / 2 Nights", "22,000", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbPiUhPavt2lc2cxyNWZ4vmc0xesrJtxTg7m-FP5sHKQ&s=10"));
-
         adapter = new PackageAdapter(this, packageList);
         recyclerView.setAdapter(adapter);
 
+        // Database එකෙන් Popular පැකේජ් 3ක් පමණක් ගැනීම
+        loadPopularPackagesFromDatabase();
+
+        // Search Filter Logic එක
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -72,6 +76,28 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    private void loadPopularPackagesFromDatabase() {
+        // "Packages" කියන Collection එකෙන් පැකේජ් 3ක් විතරක් Home එකට ගන්නවා
+        fStore.collection("Packages").limit(3).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                packageList.clear();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String title = document.getString("title");
+                    String duration = document.getString("duration");
+                    String price = document.getString("price");
+                    String imageUrl = document.getString("imageUrl");
+
+                    if (title != null) { // Error එන එක වළක්වන්න
+                        packageList.add(new PackageModel(title, duration, price, imageUrl));
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(HomeActivity.this, "Failed to load database", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void filter(String text) {
         List<PackageModel> filteredList = new ArrayList<>();
         for (PackageModel item : packageList) {
@@ -79,7 +105,7 @@ public class HomeActivity extends AppCompatActivity {
                 filteredList.add(item);
             }
         }
-        if (filteredList.isEmpty()) {
+        if (filteredList.isEmpty() && !text.isEmpty()) {
             Toast.makeText(this, "No packages found", Toast.LENGTH_SHORT).show();
         }
         adapter = new PackageAdapter(this, filteredList);
