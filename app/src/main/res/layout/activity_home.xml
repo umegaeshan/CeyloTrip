@@ -29,7 +29,8 @@
             android:paddingBottom="20dp">
 
             <TextView
-                android:id="@+id/tvWelcomeMessage"
+
+                android:id="@+id/tvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hello, Eshan!\nWhere to next?"
@@ -53,6 +54,7 @@
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     android:hint="Search destinations..."
+                    android:pointerIcon="hand"
                     android:drawableLeft="@drawable/ic_search"
                     android:drawablePadding="10dp"
                     android:paddingHorizontal="15dp"
@@ -119,27 +121,33 @@
                     android:orientation="horizontal">
 
                     <Button
+                        android:id="@+id/btnCategoryBeaches"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⛱️ Beaches"
+                        android:pointerIcon="hand"
                         android:backgroundTint="#FFFFFF"
                         android:textColor="#009772"
                         android:layout_marginHorizontal="5dp"
                         app:cornerRadius="20dp"/>
 
                     <Button
+                        android:id="@+id/btnCategoryWildlife"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🐘 Wildlife"
+                        android:pointerIcon="hand"
                         android:backgroundTint="#FFFFFF"
                         android:textColor="#009772"
                         android:layout_marginHorizontal="5dp"
                         app:cornerRadius="20dp"/>
 
                     <Button
+                        android:id="@+id/btnCategoryHeritage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🏛️ Heritage"
+                        android:pointerIcon="hand"
                         android:backgroundTint="#FFFFFF"
                         android:textColor="#009772"
                         android:layout_marginHorizontal="5dp"
@@ -149,6 +157,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="⛰️ Hiking"
+                        android:pointerIcon="hand"
                         android:backgroundTint="#FFFFFF"
                         android:textColor="#009772"
                         android:layout_marginHorizontal="5dp"

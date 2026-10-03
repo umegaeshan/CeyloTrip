@@ -1,6 +1,7 @@
 package com.example.ceylotrip;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PlaceModel model = placeList.get(position); // PlaceModel භාවිතා කළා
+        PlaceModel model = placeList.get(position);
         holder.tvName.setText(model.getName());
         holder.tvDesc.setText(model.getDescription());
         holder.tvPrice.setText(model.getPrice());
@@ -39,10 +40,28 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_error)
                 .into(holder.ivPlace);
+
+        // අයිටම් එක ක්ලික් කළ විට DetailsActivity එකට යන කේතය
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, DetailsActivity.class);
+
+                // DetailsActivity එකෙන් බලාපොරොත්තු වන යතුරු (Keys) මඟින් දත්ත යැවීම
+                intent.putExtra("title", model.getName());
+                intent.putExtra("duration", model.getDescription());
+                intent.putExtra("price", model.getPrice());
+                intent.putExtra("imageUrl", model.getImageUrl());
+
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
-    public int getItemCount() { return placeList.size(); }
+    public int getItemCount() {
+        return placeList.size();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDesc, tvPrice;

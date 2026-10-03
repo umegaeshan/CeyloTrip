@@ -10,6 +10,7 @@
     android:layout_marginTop="30dp"
     android:layout_marginRight="30dp"
     android:text="Skip"
+    android:pointerIcon="hand"
     android:textColor="#757575"
     android:textSize="16sp"
     android:textStyle="bold" />
@@ -59,6 +60,7 @@
             android:backgroundTint="#009772"
             android:text="Continue"
             android:textColor="#FFFFFF"
+            android:pointerIcon="hand"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>

@@ -95,6 +95,7 @@
         android:layout_margin="20dp"
         android:backgroundTint="#009772"
         android:text="Book Now"
+        android:pointerIcon="hand"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"

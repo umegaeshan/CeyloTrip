@@ -38,14 +38,18 @@ public class MyBookingsActivity extends AppCompatActivity {
 
         // 1. Adapter එක හදනකොට අලුතින් Click Listener එකත් පාස් කරනවා
         adapter = new BookingAdapter(this, bookingList, new BookingAdapter.OnBookingClickListener() {
+
             @Override
             public void onEditClick(BookingModel booking) {
-                // Edit බොත්තම එබුවම BookingActivity එකට යනවා (Edit Mode එකෙන්)
                 Intent intent = new Intent(MyBookingsActivity.this, BookingActivity.class);
-                intent.putExtra("isEditMode", true); // මේක අලුතින් edit කරන්න යන බව කියන්න
-                intent.putExtra("documentId", booking.getDocumentId()); // අදාළ බුකිං එකේ ID එක
+                intent.putExtra("isEditMode", true);
+                intent.putExtra("documentId", booking.getDocumentId());
                 intent.putExtra("packageName", booking.getPackageName());
-                // මිල වෙනස් කරලා තියෙන නිසා පරණ BasePrice එක ගන්න විදිහක් අපි ඊළඟට BookingActivity එකේදී හදමු
+
+                // අලුතින් එකතු කළ කොටස (Price සහ Image අනිත් පිටුවට යැවීම)
+                intent.putExtra("packagePrice", String.valueOf(booking.getBasePrice()));
+                intent.putExtra("imageUrl", booking.getImageUrl());
+
                 startActivity(intent);
             }
 

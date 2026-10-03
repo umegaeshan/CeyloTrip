@@ -8,6 +8,17 @@ public class BookingModel {
     @Exclude
     private String documentId;
 
+    // මේ variables දෙක අලුතින් එකතු කරන්න
+    private String imageUrl;
+    private int basePrice;
+
+    // යටින් මේ Getters සහ Setters ටිකත් එකතු කරන්න
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public int getBasePrice() { return basePrice; }
+    public void setBasePrice(int basePrice) { this.basePrice = basePrice; }
+
     String packageName;
     String travelDate;
     String status;

@@ -30,6 +30,10 @@ public class BookingActivity extends AppCompatActivity {
     int childCount = 0;
     int finalTotal = 0;
 
+    boolean isEditMode = false;
+    String documentId = "";
+    String imageUrl = "";
+
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
 
@@ -60,7 +64,10 @@ public class BookingActivity extends AppCompatActivity {
         // පෙර පිටුවෙන් දත්ත ලබා ගැනීම
         String packageName = getIntent().getStringExtra("packageName");
         String priceString = getIntent().getStringExtra("packagePrice");
-        String imageUrl = getIntent().getStringExtra("imageUrl");
+        imageUrl = getIntent().getStringExtra("imageUrl");
+
+        isEditMode = getIntent().getBooleanExtra("isEditMode", false);
+        documentId = getIntent().getStringExtra("documentId");
 
         if (packageName != null) {
             tvBookingPackageName.setText(packageName);
@@ -74,12 +81,16 @@ public class BookingActivity extends AppCompatActivity {
             }
         }
 
-        // පින්තූරය Load කිරීම
         if (imageUrl != null && !imageUrl.isEmpty()) {
             Glide.with(this)
                     .load(imageUrl)
                     .centerCrop()
                     .into(ivBookingImage);
+        }
+
+        // Edit කරනවා නම් බොත්තමේ නම වෙනස් කිරීම
+        if (isEditMode) {
+            btnConfirmBooking.setText("Update Booking");
         }
 
         calculateTotal();
@@ -148,17 +159,27 @@ public class BookingActivity extends AppCompatActivity {
             bookingData.put("totalPrice", finalTotal);
             bookingData.put("status", "Pending");
 
-            fStore.collection("Bookings").add(bookingData).addOnSuccessListener(documentReference -> {
-                Toast.makeText(BookingActivity.this, "Booking Successful!", Toast.LENGTH_LONG).show();
+            // Image එක සහ Base Price එක Database එකට සේව් කිරීම (Edit කරන්න මේවා අත්‍යවශ්‍යයි)
+            bookingData.put("imageUrl", imageUrl);
+            bookingData.put("basePrice", basePrice);
 
-                Intent intent = new Intent(BookingActivity.this, HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-
-            }).addOnFailureListener(e -> {
-                Toast.makeText(BookingActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+            if (isEditMode && documentId != null && !documentId.isEmpty()) {
+                // Edit Mode - පරණ දත්ත Update කිරීම
+                fStore.collection("Bookings").document(documentId).update(bookingData).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(BookingActivity.this, "Booking Updated Successfully!", Toast.LENGTH_LONG).show();
+                    goToHome();
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(BookingActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                // New Booking - අලුතින් සේව් කිරීම
+                fStore.collection("Bookings").add(bookingData).addOnSuccessListener(documentReference -> {
+                    Toast.makeText(BookingActivity.this, "Booking Successful!", Toast.LENGTH_LONG).show();
+                    goToHome();
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(BookingActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
         });
     }
 
@@ -172,5 +193,12 @@ public class BookingActivity extends AppCompatActivity {
 
         finalTotal = adultTotal + childTotal + addonsTotal;
         tvTotalPrice.setText("Rs. " + finalTotal);
+    }
+
+    private void goToHome() {
+        Intent intent = new Intent(BookingActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }
