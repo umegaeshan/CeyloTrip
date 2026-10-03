@@ -105,10 +105,14 @@ public class HomeActivity extends AppCompatActivity {
                 filteredList.add(item);
             }
         }
+
         if (filteredList.isEmpty() && !text.isEmpty()) {
             Toast.makeText(this, "No packages found", Toast.LENGTH_SHORT).show();
         }
-        adapter = new PackageAdapter(this, filteredList);
-        recyclerView.setAdapter(adapter);
+
+        // අර අපි අලුතින් හැදූ method එකට දත්ත යැවීම
+        if (adapter != null) {
+            adapter.setFilteredList(filteredList);
+        }
     }
 }

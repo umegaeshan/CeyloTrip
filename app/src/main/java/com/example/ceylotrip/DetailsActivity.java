@@ -39,7 +39,7 @@ public class DetailsActivity extends AppCompatActivity {
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 Glide.with(this)
                         .load(imageUrl)
-                        .centerCrop() // පින්තූරය කොටුවට හරියටම ගැලපෙන්න Load කරයි
+                        .centerCrop()
                         .into(ivDetailImage);
             }
 
@@ -47,6 +47,7 @@ public class DetailsActivity extends AppCompatActivity {
                 Intent bookingIntent = new Intent(DetailsActivity.this, BookingActivity.class);
                 bookingIntent.putExtra("packageName", title);
                 bookingIntent.putExtra("packagePrice", price);
+                bookingIntent.putExtra("imageUrl", imageUrl); // අලුතින් එක් කළ පේළිය
                 startActivity(bookingIntent);
             });
         }
