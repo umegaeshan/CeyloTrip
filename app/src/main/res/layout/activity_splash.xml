@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF8ED"> <!-- ලා පසුබිම් වර්ණය -->
+
+    <!-- CeyloTrip නම හෝ ලෝගෝ එක -->
+    <TextView
+        android:id="@+id/logoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="CeyloTrip"
+        android:textColor="#009772"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
+    <!-- Loading රවුම -->
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logoText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:indeterminateTint="#009772" />
+
+</RelativeLayout>
